@@ -1,6 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'maven'
-apply plugin: 'signing'
 
 group = 'com.google.maps.android'
 
@@ -54,9 +52,5 @@ artifacts {
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     classifier = 'sources'
-}
-
-signing {
-    sign configurations.archives
 }
 
