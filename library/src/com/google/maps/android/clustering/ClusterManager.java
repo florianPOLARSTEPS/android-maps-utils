@@ -19,12 +19,14 @@ package com.google.maps.android.clustering;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.MarkerManager;
 import com.google.maps.android.clustering.algo.Algorithm;
+import com.google.maps.android.clustering.algo.CachingAlgorithmDecorator;
 import com.google.maps.android.clustering.algo.NonHierarchicalDistanceBasedAlgorithm;
 import com.google.maps.android.clustering.algo.PreCachingAlgorithmDecorator;
 import com.google.maps.android.clustering.view.ClusterRenderer;
@@ -46,6 +48,9 @@ public class ClusterManager<T extends ClusterItem> implements
         GoogleMap.OnMarkerClickListener,
         GoogleMap.OnInfoWindowClickListener {
 
+    public enum CacheMode {
+        MODE_NONE, MODE_PRECACHE, MODE_CACHE
+    }
     private final MarkerManager mMarkerManager;
     private final MarkerManager.Collection mMarkers;
     private final MarkerManager.Collection mClusterMarkers;
@@ -63,6 +68,7 @@ public class ClusterManager<T extends ClusterItem> implements
     private OnClusterInfoWindowClickListener<T> mOnClusterInfoWindowClickListener;
     private OnClusterItemInfoWindowClickListener<T> mOnClusterItemInfoWindowClickListener;
     private OnClusterClickListener<T> mOnClusterClickListener;
+    private CacheMode mCacheMode;
 
     public ClusterManager(Context context, GoogleMap map) {
         this(context, map, new MarkerManager(map));
@@ -107,12 +113,28 @@ public class ClusterManager<T extends ClusterItem> implements
     }
 
     public void setAlgorithm(Algorithm<T> algorithm) {
+        setAlgorithm(algorithm, CacheMode.MODE_CACHE);
+    }
+
+    public void setAlgorithm(Algorithm<T> algorithm, CacheMode mode) {
         mAlgorithmLock.writeLock().lock();
         try {
             if (mAlgorithm != null) {
                 algorithm.addItems(mAlgorithm.getItems());
             }
-            mAlgorithm = new PreCachingAlgorithmDecorator<T>(algorithm);
+            switch (mode)
+            {
+                case MODE_NONE:
+                    mAlgorithm = algorithm;
+                    break;
+                case MODE_PRECACHE:
+                    mAlgorithm = new PreCachingAlgorithmDecorator<>(algorithm);
+                    break;
+                case MODE_CACHE:
+                    mAlgorithm = new CachingAlgorithmDecorator<>(algorithm);
+                    break;
+            }
+
         } finally {
             mAlgorithmLock.writeLock().unlock();
         }
