@@ -51,6 +51,7 @@ public class MarkerManager implements GoogleMap.OnInfoWindowClickListener, Googl
 
     /**
      * Create a new named collection, which can later be looked up by {@link #getCollection(String)}
+     *
      * @param id a unique id for this collection.
      */
     public Collection newCollection(String id) {
@@ -64,10 +65,22 @@ public class MarkerManager implements GoogleMap.OnInfoWindowClickListener, Googl
 
     /**
      * Gets a named collection that was created by {@link #newCollection(String)}
+     *
      * @param id the unique id for this collection.
      */
     public Collection getCollection(String id) {
         return mNamedCollections.get(id);
+    }
+
+    /**
+     * Removes a marker from its collection.
+     *
+     * @param marker the marker to remove.
+     * @return true if the marker was removed.
+     */
+    public boolean remove(Marker marker) {
+        Collection collection = mAllMarkers.get(marker);
+        return collection != null && collection.remove(marker);
     }
 
     @Override
@@ -129,17 +142,6 @@ public class MarkerManager implements GoogleMap.OnInfoWindowClickListener, Googl
         }
     }
 
-    /**
-     * Removes a marker from its collection.
-     *
-     * @param marker the marker to remove.
-     * @return true if the marker was removed.
-     */
-    public boolean remove(Marker marker) {
-        Collection collection = mAllMarkers.get(marker);
-        return collection != null && collection.remove(marker);
-    }
-
     public class Collection {
         private final Set<Marker> mMarkers = new HashSet<Marker>();
         private GoogleMap.OnInfoWindowClickListener mInfoWindowClickListener;
@@ -160,7 +162,12 @@ public class MarkerManager implements GoogleMap.OnInfoWindowClickListener, Googl
         public boolean remove(Marker marker) {
             if (mMarkers.remove(marker)) {
                 mAllMarkers.remove(marker);
-                marker.remove();
+                try {
+                    marker.remove();
+                } catch (IllegalArgumentException e) {
+                    // Is thrown when the marker is not added for some reason.
+                    // There is no way to find that out unfortunately.
+                }
                 return true;
             }
             return false;
@@ -168,7 +175,12 @@ public class MarkerManager implements GoogleMap.OnInfoWindowClickListener, Googl
 
         public void clear() {
             for (Marker marker : mMarkers) {
-                marker.remove();
+                try {
+                    marker.remove();
+                } catch (IllegalArgumentException e) {
+                    // Is thrown when the marker is not added for some reason.
+                    // There is no way to find that out unfortunately.
+                }
                 mAllMarkers.remove(marker);
             }
             mMarkers.clear();
