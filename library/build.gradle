@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
-apply plugin: 'signing'
 
 group = 'com.google.maps.android'
 
@@ -31,15 +30,7 @@ android {
         }
     }
 
-    // This enables long timeouts required on slow environments, e.g. Travis
-    adbOptions {
-        timeOutInMs 10 * 60 * 1000  // 10 minutes
-        installOptions "-d","-t"
-    }
-
 }
-
-task instrumentTest(dependsOn: connectedCheck)
 
 task apklib(type: Zip) {
     dependsOn 'check'
@@ -61,12 +52,5 @@ artifacts {
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     classifier = 'sources'
-}
-
-if (!hasProperty("sonatypeUsername")) {
-    sonatypeUsername = ""
-}
-if (!hasProperty("sonatypePassword")) {
-    sonatypePassword = ""
 }
 
