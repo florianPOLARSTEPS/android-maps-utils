@@ -189,7 +189,7 @@ public class GeoJsonLineStringStyle extends Style implements GeoJsonStyle {
         polylineOptions.visible(mPolylineOptions.isVisible());
         polylineOptions.width(mPolylineOptions.getWidth());
         polylineOptions.zIndex(mPolylineOptions.getZIndex());
-        polylineOptions.pattern(mPolygonOptions.getStrokePattern());
+        polylineOptions.pattern(mPolylineOptions.getPattern());
         return polylineOptions;
     }
 
