@@ -1,9 +1,13 @@
 package com.google.maps.android.data.geojson;
 
+import android.support.annotation.Nullable;
+
+import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.data.Style;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * A class that allows for GeoJsonLineString objects to be styled and for these styles to be
@@ -45,6 +49,15 @@ public class GeoJsonLineStringStyle extends Style implements GeoJsonStyle {
      */
     public void setColor(int color) {
         mPolylineOptions.color(color);
+        styleChanged();
+    }
+
+    /**
+     * sets the stroke pattern of the GeoJsonLineString
+     * @param items
+     */
+    public void setStrokePattern(List<PatternItem> items) {
+        mPolylineOptions.pattern(items);
         styleChanged();
     }
     
@@ -125,6 +138,15 @@ public class GeoJsonLineStringStyle extends Style implements GeoJsonStyle {
     }
 
     /**
+     *
+     * @return a list of {@link PatternItem}s for the polyline
+     */
+    @Nullable
+    public List<PatternItem> getStrokePattern() {
+        return mPolylineOptions.getPattern();
+    }
+
+    /**
      * Gets whether the GeoJsonLineString is visible
      *
      * @return true if the GeoJsonLineString visible, false if not visible
@@ -167,6 +189,7 @@ public class GeoJsonLineStringStyle extends Style implements GeoJsonStyle {
         polylineOptions.visible(mPolylineOptions.isVisible());
         polylineOptions.width(mPolylineOptions.getWidth());
         polylineOptions.zIndex(mPolylineOptions.getZIndex());
+        polylineOptions.pattern(mPolygonOptions.getStrokePattern());
         return polylineOptions;
     }
 
@@ -180,6 +203,7 @@ public class GeoJsonLineStringStyle extends Style implements GeoJsonStyle {
         sb.append(",\n visible=").append(isVisible());
         sb.append(",\n width=").append(getWidth());
         sb.append(",\n z index=").append(getZIndex());
+        sb.append(",\n pattern=").append(getStrokePattern());
         sb.append("\n}\n");
         return sb.toString();
     }
