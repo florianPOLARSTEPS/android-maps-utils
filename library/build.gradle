@@ -4,13 +4,13 @@ apply plugin: 'maven'
 group = 'com.google.maps.android'
 
 dependencies {
-    compile 'com.google.android.gms:play-services-maps:10.2.0'
+    compile 'com.google.android.gms:play-services-maps:11.6.2'
 }
 
 android {
-    compileSdkVersion 24
+    compileSdkVersion 26
 
-    buildToolsVersion '25.0.2'
+    buildToolsVersion '27.0.1'
 
     resourcePrefix 'amu_'
 
